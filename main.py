@@ -1,5 +1,6 @@
 import os
 import SceneModule as scene
+import CommandModule as command
 import tornado.ioloop
 import tornado.web
 
@@ -19,25 +20,27 @@ def print_xy_click(shp, *kwargs):
 #display, start_display, add_menu, add_function_to_menu = init_display()
 
 # Tworzenie obiektów
-box = BRepPrimAPI_MakeBox(10, 20, 30).Shape()
-my_torus = BRepPrimAPI_MakeTorus(20.0, 10.0).Shape()
+#box = BRepPrimAPI_MakeBox(10, 20, 30).Shape()
+#my_torus = BRepPrimAPI_MakeTorus(20.0, 10.0).Shape()
 
 # Tworzenie sceny
 scene = scene.Scene()
+commandExecutor = command.CommandExecutor(scene)
+
 
 # Dodanie obiektow do sceny
-scene.add_object(box)
-scene.add_object(my_torus)
+#scene.add_object(box)
+#scene.add_object(my_torus)
 
 # Usun box z sceny
 # scene.remove_object(box)
 
 # Przesun obiekt
-scene.translate_object(box, 100, 20, 35)
-scene.translate_object(my_torus, -100, 20, 35)
+#scene.translate_object(box, 100, 20, 35)
+#scene.translate_object(my_torus, -100, 20, 35)
 
 # Wczytaj model
-scene.import_model("assets/models/cake.iges","iges",0,50,100)
+#scene.import_model("assets/models/cake.iges","iges",0,50,100)
 
 # sciezka do pliku sceny
 stl_output = "assets/models/scene.stl"
@@ -48,16 +51,8 @@ scene.export_to_stl(stl_output)
 # Wczytanie sceny
 stl_scene = read_stl_file(stl_output)
 
-# Wyświetlenie sceny
-#display.DisplayShape(stl_scene, update=True)
 
-# Callback do wyświetlania pozycji kursora i wyswietlania nazwy kliknietego obiektu
-#display.register_select_callback(print_xy_click)
-
-# Uruchomienie interaktywnego widoku
-#start_display()
-
-class MainHandler(tornado.web.RequestHandler):
+class SelectObjectRequestHandler(tornado.web.RequestHandler):
     def set_default_headers(self):
         self.set_header("Access-Control-Allow-Origin", "*")
         self.set_header("Access-Control-Allow-Headers", "x-requested-with")
@@ -67,9 +62,16 @@ class MainHandler(tornado.web.RequestHandler):
         self.set_status(204)
         self.finish()
         
-    def get(self):
-        self.write("Hello, world2")
-class AddLayerHandler(tornado.web.RequestHandler):
+    def post(self):
+        requestData = tornado.escape.json_decode(self.request.body)
+        
+        requestCommand = command.Command("SelectObject", requestData)
+        response = commandExecutor.execute(requestCommand)
+        
+        print("Request " + requestCommand.commandName + "executed succesfully!")
+        self.write(response)
+        
+class ModifyLayerPropertiesRequestHandler(tornado.web.RequestHandler):
     def set_default_headers(self):
         self.set_header("Access-Control-Allow-Origin", "*")
         self.set_header("Access-Control-Allow-Headers", "x-requested-with")
@@ -79,15 +81,47 @@ class AddLayerHandler(tornado.web.RequestHandler):
         self.set_status(204)
         self.finish()
         
-    def get(self):
+    def post(self):
+        requestData = tornado.escape.json_decode(self.request.body)
+        
+        requestCommand = command.Command("ModifyLayerProperties", requestData)
+        response = commandExecutor.execute(requestCommand)
+        
+        print("Request " + requestCommand.commandName + "executed succesfully!")
+        self.write(response)
+        
+        
+        
+class AddLayerRequestHandler(tornado.web.RequestHandler):
+    def set_default_headers(self):
+        self.set_header("Access-Control-Allow-Origin", "*")
+        self.set_header("Access-Control-Allow-Headers", "x-requested-with")
+        self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
+        
+    def options(self, *args):
+        self.set_status(204)
+        self.finish()
+        
+    def post(self):
+        requestData = tornado.escape.json_decode(self.request.body)
+        
+        requestCommand = command.Command("AddNewLayer", requestData)
+        commandExecutor.execute(requestCommand)
+    
         encodedModel = scene.export_to_stl_base64()
         response = {"sceneModel": encodedModel}
-        print("Request captured!")
+        
+        print("Request " + requestCommand.commandName + "executed succesfully!")
         self.write(response)
+        
+        
+        
+        
 def make_app():
     return tornado.web.Application([
-        (r"/", MainHandler),
-        (r"/addLayer", AddLayerHandler),
+        (r"/select", SelectObjectRequestHandler),
+        (r"/modify/layer", ModifyLayerPropertiesRequestHandler),
+        (r"/add/layer", AddLayerRequestHandler),
     ])
 if __name__ == "__main__":
     app = make_app()
