@@ -9,6 +9,9 @@ class Command:
     def __init__(self, commandName, jsonParams):
         self.commandName = commandName
         self.jsonParams = jsonParams      
+    
+    def asJson(self):
+        return {"commandName": self.commandName, "params": self.jsonParams }
         
         
 class CommandExecutor:
@@ -58,4 +61,11 @@ class CommandExecutor:
         print("Api executed modify layer command succesfully! But there is no implementation YET!")
 
         return 
+    
+    def SaveProject(self):
+        jsonCommandList =  []
+        for command in self.executedCommandHistory:
+            jsonCommandList.append(command.asJson())
+        
+        return {"commands": jsonCommandList}
     

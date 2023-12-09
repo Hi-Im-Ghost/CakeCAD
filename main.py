@@ -114,12 +114,26 @@ class AddLayerRequestHandler(tornado.web.RequestHandler):
         print("Request " + requestCommand.commandName + "executed succesfully!")
         self.write(response)
         
+class SaveProjectRequestHandler(tornado.web.RequestHandler):
+    def set_default_headers(self):
+        self.set_header("Access-Control-Allow-Origin", "*")
+        self.set_header("Access-Control-Allow-Headers", "x-requested-with")
+        self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
+        
+    def options(self, *args):
+        self.set_status(204)
+        self.finish()
+        
+    def get(self):
+        response = commandExecutor.SaveProject()
+        self.write(response)
         
         
         
 def make_app():
     return tornado.web.Application([
         (r"/select", SelectObjectRequestHandler),
+        (r"/project/save", SaveProjectRequestHandler),
         (r"/modify/layer", ModifyLayerPropertiesRequestHandler),
         (r"/add/layer", AddLayerRequestHandler),
     ])
