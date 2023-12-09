@@ -124,10 +124,29 @@ class SaveProjectRequestHandler(tornado.web.RequestHandler):
         self.set_status(204)
         self.finish()
         
-    def get(self):
+    def post(self):
         response = commandExecutor.SaveProject()
         self.write(response)
         
+    
+class LoadProjectRequestHandler(tornado.web.RequestHandler):
+    def set_default_headers(self):
+        self.set_header("Access-Control-Allow-Origin", "*")
+        self.set_header("Access-Control-Allow-Headers", "x-requested-with")
+        self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
+        
+    def options(self, *args):
+        self.set_status(204)
+        self.finish()
+        
+    def post(self):
+        requestData = tornado.escape.json_decode(self.request.body)
+       
+        #TODO: do implementacji 
+        #Należy tu zresetować projekt, a nastpenie wykonać wszystkie polecenia które przyszły w requestData
+        
+        
+        self.write(response)
         
         
 def make_app():
