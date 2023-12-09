@@ -153,6 +153,7 @@ def make_app():
     return tornado.web.Application([
         (r"/select", SelectObjectRequestHandler),
         (r"/project/save", SaveProjectRequestHandler),
+        (r"/project/load", LoadProjectRequestHandler),
         (r"/modify/layer", ModifyLayerPropertiesRequestHandler),
         (r"/add/layer", AddLayerRequestHandler),
     ])
