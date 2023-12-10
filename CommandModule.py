@@ -1,9 +1,5 @@
 import SceneModule as scene
-from OCC.Core.BRep import BRep_Builder
 from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeBox, BRepPrimAPI_MakeTorus
-from OCC.Core.TopoDS import TopoDS_Compound
-from OCC.Extend.DataExchange import write_stl_file, read_stl_file
-from OCC.Display.SimpleGui import init_display
 
 class Command:
     def __init__(self, commandName, jsonParams):
