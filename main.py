@@ -115,10 +115,18 @@ class LoadProjectRequestHandler(tornado.web.RequestHandler):
         
         self.write(response)
         
+class HelloWorldHandler(tornado.web.RequestHandler):
+        
+    def get(self):
+        
+        print("Request hello worldexecuted succesfully!")
+        self.write("Hello world")
+        
         
 def make_app():
     return tornado.web.Application([
         (r"/select", SelectObjectRequestHandler),
+        (r"/hello", HelloWorldHandler),
         (r"/project/save", SaveProjectRequestHandler),
         (r"/project/load", LoadProjectRequestHandler),
         (r"/modify/layer", ModifyLayerPropertiesRequestHandler),
@@ -127,4 +135,6 @@ def make_app():
 if __name__ == "__main__":
     app = make_app()
     app.listen(8888)
+    print("Backend server started!")
     tornado.ioloop.IOLoop.current().start()
+    print("Backend server closed!")
