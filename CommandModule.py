@@ -19,6 +19,7 @@ class CommandExecutor:
     def execute(self, commandObject):
         #Zapis wykonanego polecenia
         self.executedCommandHistory.append(commandObject)
+        print ("Executing command " + commandObject.commandName)
         
         #Wykonywanie
         if commandObject.commandName == "AddNewLayer":
@@ -55,7 +56,8 @@ class CommandExecutor:
     def __modifyLayerHandler(self, requestData):
         #TODO: Do implementacji
         print("Api executed modify layer command succesfully! But there is no implementation YET!")
-
+            
+            
         return 
     
     def SaveProject(self):

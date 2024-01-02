@@ -52,7 +52,11 @@ class ModifyLayerPropertiesRequestHandler(tornado.web.RequestHandler):
         requestData = tornado.escape.json_decode(self.request.body)
         
         requestCommand = command.Command("ModifyLayerProperties", requestData)
-        response = commandExecutor.execute(requestCommand)
+        
+        commandExecutor.execute(requestCommand)
+        
+        encodedModel = scene.export_to_stl_base64()
+        response = {"sceneModel": encodedModel}
         
         print("Request " + requestCommand.commandName + "executed succesfully!")
         self.write(response)
