@@ -12,6 +12,7 @@ from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeBox, BRepPrimAPI_MakeTorus
 from OCC.Extend.DataExchange import write_stl_file, read_stl_file
 from OCC.Display.SimpleGui import init_display
 
+from SceneObject import *
 
 # Funkcja do wyswietlania pozycji kursora i wyswietlania nazwy zaznaczonego ksztaltu
 def print_xy_click(shp, *kwargs):
@@ -34,32 +35,36 @@ def print_xy_click(shp, *kwargs):
 display, start_display, add_menu, add_function_to_menu = init_display()
 
 # Tworzenie obiektów
-box = BRepPrimAPI_MakeBox(10, 20, 30).Shape()
-my_torus = BRepPrimAPI_MakeTorus(20.0, 10.0).Shape()
+#box = BRepPrimAPI_MakeBox(10, 20, 30).Shape()
+#my_torus = BRepPrimAPI_MakeTorus(20.0, 10.0).Shape()
 
 # Tworzenie sceny
 scene = scene.Scene()
 commandExecutor = command.CommandExecutor(scene)
 
 # Dodanie obiektow do sceny
-scene.add_object("box", box)
-scene.add_object("torus", my_torus)
+#scene.add_object("box", box)
+#scene.add_object("torus", my_torus)
+# Przykład użycia funkcji create_shape_from_points
+points = [(0, 0, 0), (1, 0, 0), (1, 1, 0), (0, 1, 0)]
+height = 4.0
+scene.add_object_from_points("Custom", points, height)
 
 print("Objects before removal:")
 for obj in scene.objects:
     print(obj.obj_id)
 
 # Usun box z sceny
-scene.remove_object(1000)
+#scene.remove_object(1000)
 
 
 
 # Przesun obiekt
 # scene.translate_object(1000, 100, 20, 35)
-scene.translate_object(1001, -100, 20, 35)
+#scene.translate_object(1001, -100, 20, 35)
 
 # Wczytaj model
-scene.import_model("cake", "assets/models/cake.iges", "iges", 0, 50, 100)
+#scene.import_model("cake", "assets/models/cake.iges", "iges", 0, 50, 100)
 
 # sciezka do pliku sceny
 stl_output = "assets/models/scene.stl"

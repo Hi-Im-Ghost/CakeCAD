@@ -2,23 +2,27 @@ import os
 import base64
 
 from OCC.Core.BRep import BRep_Builder
-from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeBox, BRepPrimAPI_MakeTorus
 from OCC.Core.TopLoc import TopLoc_Location
-from OCC.Core.TopoDS import TopoDS_Compound, TopoDS_Shape
+from OCC.Core.TopoDS import TopoDS_Compound
 from OCC.Core.gp import gp_Vec, gp_Trsf
 from OCC.Extend.DataExchange import write_stl_file, read_stl_file, read_step_file, read_iges_file
 
 from SceneObject import *
+
 
 class Scene:
 
     def __init__(self):
         self.objects = []
 
-    def add_object(self, obj_type: str, obj_shape):
+    def add_object(self, obj_type: str = "None", obj_shape=None):
         new_object = SceneObject(obj_type, obj_shape)
         self.objects.append(new_object)
         return new_object.obj_id
+
+    def add_object_from_points(self, obj_type: str, points, height):
+        obj_shape = SceneObject.create_custom_shape(points, height)
+        return self.add_object(obj_type, obj_shape)
 
     def remove_object(self, obj_id: int):
         self.objects.remove(self.find_object(obj_id))
@@ -32,6 +36,7 @@ class Scene:
     def export_model_to_stl(self, obj, path: str):
         # Zapisz do pliku STL
         write_stl_file(obj, path, mode="binary", linear_deflection=0.5, angular_deflection=0.3)
+
     def export_scene_to_stl(self, path: str):
         # deklaracja pustego obiektu
         compound = TopoDS_Compound()
