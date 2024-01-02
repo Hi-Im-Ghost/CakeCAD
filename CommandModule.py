@@ -38,10 +38,11 @@ class CommandExecutor:
         
         if requestData['type'] == "box":
             box = BRepPrimAPI_MakeBox(10, 20, 30).Shape()
-            self.sceneObject.add_object(box)
+            self.sceneObject.add_object(requestData['type'], box)
+            
         elif requestData['type'] == "torus":
             my_torus = BRepPrimAPI_MakeTorus(20.0, 10.0).Shape()
-            self.sceneObject.add_object(my_torus)
+            self.sceneObject.add_object(requestData['type'], my_torus)
         return
             
     def __selectObjectHandler(self, requestData):
