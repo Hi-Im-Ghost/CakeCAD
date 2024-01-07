@@ -5,13 +5,15 @@ from OCC.Core.BRep import BRep_Builder
 from OCC.Core.TopLoc import TopLoc_Location
 from OCC.Core.TopoDS import TopoDS_Compound
 from OCC.Core.gp import gp_Vec, gp_Trsf
+from OCC.Core.BRepFilletAPI import BRepFilletAPI_MakeFillet
+from OCC.Core.TopoDS import TopoDS_Compound, TopoDS_Edge
 from OCC.Extend.DataExchange import write_stl_file, read_stl_file, read_step_file, read_iges_file
+from OCC.Extend.TopologyUtils import TopologyExplorer
 
 from SceneObject import *
 
 
 class Scene:
-
     def __init__(self):
         self.objects = []
 
@@ -24,13 +26,17 @@ class Scene:
         obj_shape = SceneObject.create_custom_shape(points, height)
         return self.add_object(obj_type, obj_shape)
 
+    def add_bspline_from_points(self, obj_type: str, points, height, closed):
+        obj_shape = SceneObject.create_custom_bspline(points, height, closed)
+        return self.add_object(obj_type, obj_shape)
+
     def remove_object(self, obj_id: int):
         self.objects.remove(self.find_object(obj_id))
 
     def find_object(self, obj_id: int):
-        for object in self.objects:
-            if object.obj_id == obj_id:
-                return object
+        for obj in self.objects:
+            if obj.obj_id == obj_id:
+                return obj
         return None
 
     def export_model_to_stl(self, obj, path: str):
@@ -88,4 +94,33 @@ class Scene:
             shape = obj.obj_shape
             shape.Move(location)
         else:
+            print(f"Object with id {obj_id} not found in the scene.")
+
+    def fillet_edges(self, obj_id: int, radius: float):
+        # Znajdz obiekt o podanym ID
+        obj = self.find_object(obj_id)
+        # Sprawdz czy istnieje
+        if obj is not None:
+            # Pobierz ksztalt
+            shape = obj.obj_shape
+            # Inicjacja narzedzia do zaokraglen
+            fillet = BRepFilletAPI_MakeFillet(shape)
+            # Iteracja po krawedziach
+            for e in TopologyExplorer(shape).edges():
+                try:
+                    # Proba dodania zaokraglenia do krawedzi
+                    fillet.Add(radius, e)
+                except RuntimeError as e:
+                    # Ostrzezenie w przypadku bledu
+                    print(f"Warning: Error while adding fillet to edge: {e}. Skipping this edge.")
+
+            try:
+                # Zastosowanie zaokraglenia do obiektu
+                obj.obj_shape = fillet.Shape()
+            except RuntimeError as e:
+                # Wyswietl blad jesli operacja sie nie powiodla
+                print(f"Error: {e}")
+                print(f"Fillet operation failed for object with id {obj_id}. Try reducing the fillet radius.")
+        else:
+            # Wyswietl komunikat jesli nie ma obiektu o takim id
             print(f"Object with id {obj_id} not found in the scene.")

@@ -35,7 +35,7 @@ def print_xy_click(shp, *kwargs):
 display, start_display, add_menu, add_function_to_menu = init_display()
 
 # Tworzenie obiektów
-#box = BRepPrimAPI_MakeBox(10, 20, 30).Shape()
+#ox = BRepPrimAPI_MakeBox(10, 20, 30).Shape()
 #my_torus = BRepPrimAPI_MakeTorus(20.0, 10.0).Shape()
 
 # Tworzenie sceny
@@ -49,6 +49,8 @@ commandExecutor = command.CommandExecutor(scene)
 points = [(0, 0, 0), (1, 0, 0), (1, 1, 0), (0, 1, 0)]
 height = 4.0
 scene.add_object_from_points("Custom", points, height)
+scene.fillet_edges(1000, 0.2)
+#scene.add_bspline_from_points("bspline", points, height, True)
 
 print("Objects before removal:")
 for obj in scene.objects:
