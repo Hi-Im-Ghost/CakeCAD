@@ -62,6 +62,29 @@ class ModifyLayerPropertiesRequestHandler(tornado.web.RequestHandler):
         self.write(response)
         
         
+class RoundLayerRequestHandler(tornado.web.RequestHandler):
+    def set_default_headers(self):
+        self.set_header("Access-Control-Allow-Origin", "*")
+        self.set_header("Access-Control-Allow-Headers", "x-requested-with")
+        self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
+        
+    def options(self, *args):
+        self.set_status(204)
+        self.finish()
+        
+    def post(self):
+        requestData = tornado.escape.json_decode(self.request.body)
+        
+        requestCommand = command.Command("RoundLayerCommand", requestData)
+        newObjectId = commandExecutor.execute(requestCommand)
+    
+        encodedModel = scene.export_model_to_stl_base64(newObjectId)
+        response = {"sceneModel": encodedModel, "id": newObjectId}
+        
+        print("Request " + requestCommand.commandName + "executed succesfully!")
+        self.write(response)
+        
+        
         
 class AddLayerRequestHandler(tornado.web.RequestHandler):
     def set_default_headers(self):
@@ -77,10 +100,10 @@ class AddLayerRequestHandler(tornado.web.RequestHandler):
         requestData = tornado.escape.json_decode(self.request.body)
         
         requestCommand = command.Command("AddNewLayer", requestData)
-        commandExecutor.execute(requestCommand)
+        newObjectId = commandExecutor.execute(requestCommand)
     
-        encodedModel = scene.export_to_stl_base64()
-        response = {"sceneModel": encodedModel}
+        encodedModel = scene.export_model_to_stl_base64(newObjectId)
+        response = {"sceneModel": encodedModel, "id": newObjectId}
         
         print("Request " + requestCommand.commandName + "executed succesfully!")
         self.write(response)
@@ -134,6 +157,7 @@ def make_app():
         (r"/project/save", SaveProjectRequestHandler),
         (r"/project/load", LoadProjectRequestHandler),
         (r"/modify/layer", ModifyLayerPropertiesRequestHandler),
+        (r"/round/layer", RoundLayerRequestHandler),
         (r"/add/layer", AddLayerRequestHandler),
     ])
 if __name__ == "__main__":

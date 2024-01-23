@@ -1,5 +1,5 @@
 import SceneModule as scene
-from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeBox, BRepPrimAPI_MakeTorus
+from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeBox, BRepPrimAPI_MakeTorus, BRepPrimAPI_MakeCylinder
 
 class Command:
     def __init__(self, commandName, jsonParams):
@@ -28,22 +28,32 @@ class CommandExecutor:
             return self.__selectObjectHandler(commandObject.jsonParams)
         elif commandObject.commandName == "ModifyLayerProperties":
             return self.__modifyLayerHandler(commandObject.jsonParams)
+        elif commandObject.commandName == "RoundLayerCommand":
+            return self.__roundLayerHandler(commandObject.jsonParams)
         
-        
+    def __roundLayerHandler(self, requestData):
+        self.sceneObject.fillet_edges(requestData['id'], 3.0)
+            
+        return requestData['id']
             
     def __addNewLayerHandler(self, requestData):
         #TODO: tutaj drodzy backendwcy możecie sobie wyciągnąć dane z request data i zastosować je do sceny
         #Przykład
         print("Creating new layer of type: " + requestData['type'])
-        
+        id = -1
         if requestData['type'] == "box":
-            box = BRepPrimAPI_MakeBox(10, 20, 30).Shape()
-            self.sceneObject.add_object(requestData['type'], box)
+            box = BRepPrimAPI_MakeBox(10, 10, 5).Shape()
+            id = self.sceneObject.add_object(requestData['type'], box)
             
         elif requestData['type'] == "torus":
-            my_torus = BRepPrimAPI_MakeTorus(20.0, 10.0).Shape()
-            self.sceneObject.add_object(requestData['type'], my_torus)
-        return
+            my_torus = BRepPrimAPI_MakeTorus(20.0, 5.0).Shape()
+            id = self.sceneObject.add_object(requestData['type'], my_torus)
+            
+        elif requestData['type'] == "cylinder":
+            my_cyulinder = BRepPrimAPI_MakeCylinder(10.0, 5.0).Shape()
+            id = self.sceneObject.add_object(requestData['type'], my_cyulinder)
+            
+        return id
             
     def __selectObjectHandler(self, requestData):
         selectedOnFronendObjectId = requestData['objectId']

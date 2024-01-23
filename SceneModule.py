@@ -39,9 +39,11 @@ class Scene:
                 return obj
         return None
 
-    def export_model_to_stl(self, obj, path: str):
+    def export_model_to_stl(self, obj_id, path: str):
+        obj = self.find_object(obj_id)
+        shape = obj.obj_shape
         # Zapisz do pliku STL
-        write_stl_file(obj, path, mode="binary", linear_deflection=0.5, angular_deflection=0.3)
+        write_stl_file(shape, path, mode="binary", linear_deflection=0.5, angular_deflection=0.3)
 
     def export_scene_to_stl(self, path: str):
         # deklaracja pustego obiektu
@@ -71,6 +73,23 @@ class Scene:
         file_read = file_text.read()
         file_encode = base64.encodebytes(file_read).decode('ascii')
         return file_encode
+    
+    
+    def export_model_to_stl_base64(self, modelId):
+        path = "assets/models/tmp.stl"
+
+        self.export_model_to_stl(modelId, path)
+        
+        file_text = open(path, 'rb')
+        file_read = file_text.read()
+        file_encode = base64.encodebytes(file_read).decode('ascii')
+        return file_encode
+
+
+
+
+
+
 
     def import_model(self, obj_type: str, file_path: str, file_format: str, x=0, y=0, z=0):
         if file_format.lower() == "stl":
