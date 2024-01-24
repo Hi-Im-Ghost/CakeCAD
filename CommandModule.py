@@ -21,7 +21,7 @@ class CommandExecutor:
         self.executedCommandHistory.append(commandObject)
         print ("Executing command " + commandObject.commandName)
         
-        #Wykonywanie
+        #Wykonywanie 
         if commandObject.commandName == "AddNewLayer":
             return self.__addNewLayerHandler(commandObject.jsonParams)
         elif commandObject.commandName == "SelectObject":
@@ -30,7 +30,29 @@ class CommandExecutor:
             return self.__modifyLayerHandler(commandObject.jsonParams)
         elif commandObject.commandName == "RoundLayerCommand":
             return self.__roundLayerHandler(commandObject.jsonParams)
+        elif commandObject.commandName == "CreateFromPointsCommand":
+            return self.__createFromPointsHandler(commandObject.jsonParams)
         
+        
+    def __createFromPointsHandler(self, requestData):
+        
+        
+        points = []
+        height = 10
+        
+        for point in requestData['points']:
+            splited = point.replace(" ", "").split(",")
+            x = float(splited[0])
+            y = float(splited[1])
+            z = float(splited[2])
+            points.append((x,y,z))
+            
+
+        
+        id = self.sceneObject.add_object_from_points("Custom", points, height )
+
+        return id
+    
     def __roundLayerHandler(self, requestData):
         self.sceneObject.fillet_edges(requestData['id'], 3.0)
             

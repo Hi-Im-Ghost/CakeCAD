@@ -102,6 +102,8 @@ class AddLayerRequestHandler(tornado.web.RequestHandler):
         requestCommand = command.Command("AddNewLayer", requestData)
         newObjectId = commandExecutor.execute(requestCommand)
     
+        print("MODEL ID:", newObjectId)
+    
         encodedModel = scene.export_model_to_stl_base64(newObjectId)
         response = {"sceneModel": encodedModel, "id": newObjectId}
         
@@ -142,6 +144,32 @@ class LoadProjectRequestHandler(tornado.web.RequestHandler):
         
         self.write(response)
         
+        
+class CreateFromPointsHandler(tornado.web.RequestHandler):
+    def set_default_headers(self):
+        self.set_header("Access-Control-Allow-Origin", "*")
+        self.set_header("Access-Control-Allow-Headers", "x-requested-with")
+        self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
+        
+    def options(self, *args):
+        self.set_status(204)
+        self.finish()
+        
+    def post(self):
+        requestData = tornado.escape.json_decode(self.request.body)
+               
+        requestCommand = command.Command("CreateFromPointsCommand", requestData)
+        newObjectId = commandExecutor.execute(requestCommand)
+    
+        print("MODEL ID:", newObjectId)
+    
+        encodedModel = scene.export_model_to_stl_base64(newObjectId)
+        response = {"sceneModel": encodedModel, "id": newObjectId}
+        
+        print("Request " + requestCommand.commandName + "executed succesfully!")
+        
+        self.write(response)
+        
 class HelloWorldHandler(tornado.web.RequestHandler):
         
     def get(self):
@@ -158,6 +186,7 @@ def make_app():
         (r"/project/load", LoadProjectRequestHandler),
         (r"/modify/layer", ModifyLayerPropertiesRequestHandler),
         (r"/round/layer", RoundLayerRequestHandler),
+        (r"/create/from/points", CreateFromPointsHandler),
         (r"/add/layer", AddLayerRequestHandler),
     ])
 if __name__ == "__main__":

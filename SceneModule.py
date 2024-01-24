@@ -24,11 +24,13 @@ class Scene:
 
     def add_object_from_points(self, obj_type: str, points, height):
         obj_shape = SceneObject.create_custom_shape(points, height)
-        return self.add_object(obj_type, obj_shape)
+        idd = self.add_object(obj_type, obj_shape)
+        return idd 
 
     def add_bspline_from_points(self, obj_type: str, points, height, closed):
         obj_shape = SceneObject.create_custom_bspline(points, height, closed)
-        return self.add_object(obj_type, obj_shape)
+        idd = self.add_object(obj_type, obj_shape)
+        return idd 
 
     def remove_object(self, obj_id: int):
         self.objects.remove(self.find_object(obj_id))
