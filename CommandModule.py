@@ -54,7 +54,7 @@ class CommandExecutor:
         return id
     
     def __roundLayerHandler(self, requestData):
-        self.sceneObject.fillet_edges(requestData['id'], 3.0)
+        self.sceneObject.fillet_edges(requestData['id'], 0.9)
             
         return requestData['id']
             
